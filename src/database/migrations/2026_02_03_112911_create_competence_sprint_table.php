@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('competence_sprint', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('competence_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('sprint_id')->constrained()->cascadeOnDelete();
+            $table->primary(['competence_id','sprint_id']);
             $table->timestamps();
         });
     }
