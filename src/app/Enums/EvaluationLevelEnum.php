@@ -2,7 +2,10 @@
 
 namespace App\Enums;
 
-enum EvaluationLevelEnum
+enum EvaluationLevelEnum : string
 {
-    //
+    case IMITER = 'imiter';
+    case S_ADAPTER = 's_adapter';
+    case TRANSPOSER = 'transposeur';
+
 }
