@@ -12,7 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('class_sprint', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('class_id')->constrained()->cascadeOnDelete();
             $table->foreignId('sprint_id')->constrained('sprints')->cascadeOnDelete();
             $table->primary(['class_id','sprint_id']);
