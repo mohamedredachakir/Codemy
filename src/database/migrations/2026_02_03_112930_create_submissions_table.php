@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('submissions', function (Blueprint $table) {
             $table->id();
+
+            $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('brief_id')->constrained('briefs')->cascadeOnDelete();
+            $table->text('content');
+            $table->timestamp('submitted_at');
             $table->timestamps();
         });
     }
