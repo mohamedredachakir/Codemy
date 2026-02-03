@@ -2,7 +2,8 @@
 
 namespace App\Enums;
 
-enum BriefTypeEnum
+enum BriefTypeEnum : string
 {
-    //
+    case INDIVIDUAL = "individual";
+    case GROUP = "group";
 }
