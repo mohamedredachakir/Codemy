@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\SchoolClass;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,7 +16,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view("");
+        $users = User::with('schoolclass')->latest()->get();
+        return view('users.index', compact('users'));
     }
 
     /**
@@ -22,7 +25,8 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view("");
+        $classes = SchoolClass::all();
+        return view("users.create", compact('classes'));
     }
 
     /**
@@ -36,6 +40,7 @@ class UserController extends Controller
             "email" => "required|email|unique:users",
             "password" => "required|confirmed",
             "role"=> "nullable",
+            "class_id" => "nullable|exists:classes,id" ,
         ]);
 
         $user = User::create([
@@ -43,12 +48,12 @@ class UserController extends Controller
             "last_name"=> $validated["last_name"],
             "email"=> $validated["email"],
             "password"=> Hash::make($validated["password"]),
-            "role"=> $validated["role"] ?? "user",
+            "role"=> $validated["role"] ?? UserRole::STUDENT,
             "class_id"=> $validated["class_id"] ?? null,
         ]);
 
         if($user){
-            return redirect()->route("")->with("success","user created!");
+            return redirect()->route("users.index")->with("success","user created!");
         }else {return 'error! register failed!';}
     }
 
@@ -57,19 +62,24 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::with(['schoolclass','submissions','evaluations'])->find($id);
+        return view("users.show", compact('user'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit($request, string $id)
+    public function edit(string $id)
     {
-        if(Auth::user()->role !== 'admin'){
-            return redirect('')->with('error','');
-        }else{
-            return view("");
+        if(!auth()->user()->isAdmin()){
+            return redirect()->route('users.index')
+                ->with('error','No access');
         }
+
+        $user = User::findOrFail($id);
+        $classes = SchoolClass::all();
+
+        return view("users.edit", compact('user','classes'));
     }
 
     /**
@@ -77,35 +87,46 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-          $validate = $request->validate([
+        if(!auth()->user()->isAdmin()){
+            abort(403);
+        }
+
+        $user = User::findOrFail($id);
+
+        $validate = $request->validate([
             'first_name'=> 'required',
             'last_name'=> 'required',
-            'email'=> 'required|email',
-            'password'=> 'required|confirmed',
-            'role'=> 'nullable',
+            'email'=> 'required|email|unique:users,email,' . $id,
+            'password'=> 'nullable|confirmed',
+            'class_id' => 'nullable|exists:classes,id'
         ]);
-        if(Auth::user()->role !== 'admin'){
-           abort(403);
-           return redirect();
+
+        if($request->filled('password')){
+            $validate['password'] = Hash::make($request->password);
         }else{
-             $user = User::find($id);
-            $user->update($validate);
+            unset($validate['password']);
         }
+
+        $user->update($validate);
+
+        return redirect()->route('users.index')
+            ->with('success','User updated');
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        if(Auth::user()->role !== 'admin'){
-            return redirect('')->with('error','');
-        }else {
-            $user = User::find($id);
-            if($user){
-                $user->delete();
-            }
-
+        if(!auth()->user()->isAdmin()){
+            abort(403);
         }
+
+        User::findOrFail($id)->delete();
+
+        return redirect()->route('users.index')
+            ->with('success','User deleted');
     }
+
 }
