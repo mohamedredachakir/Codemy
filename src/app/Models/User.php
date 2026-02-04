@@ -55,6 +55,10 @@ class User extends Authenticatable
         return $this->role === UserRole::STUDENT;
     }
 
+    public function isAdmin(){
+        return $this->role === UserRole::ADMIN;
+    }
+
     public function isTeacher()
     {
         return $this->role === UserRole::TEACHER;
