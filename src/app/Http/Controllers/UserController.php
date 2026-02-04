@@ -82,6 +82,7 @@ class UserController extends Controller
             'last_name'=> 'required',
             'email'=> 'required|email',
             'password'=> 'required|confirmed',
+            'role'=> 'nullable',
         ]);
         if(Auth::user()->role !== 'admin'){
            abort(403);
