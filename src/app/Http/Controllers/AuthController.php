@@ -14,7 +14,7 @@ class AuthController extends Controller
     public function login(Request $request){
            $credentails = $request->validate([]);
            if($credentails){
-            return redirect("")->with("","");
+            return redirect()->route("dashboard")->with("login","seccsus!!");
            }else{
             return "error login!";
            }

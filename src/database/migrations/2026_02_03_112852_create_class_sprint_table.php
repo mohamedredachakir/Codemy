@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('class_sprint', function (Blueprint $table) {
-            $table->foreignId('class_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('class_id')->constrained('school_classes')->cascadeOnDelete();
             $table->foreignId('sprint_id')->constrained('sprints')->cascadeOnDelete();
             $table->primary(['class_id','sprint_id']);
             $table->timestamps();

@@ -21,9 +21,9 @@ return new class extends Migration
             $table->enum('type', [BriefTypeEnum::INDIVIDUAL, BriefTypeEnum::GROUP]);
 
             $table->foreignId('sprint_id')->constrained('sprints');
-            $table->foreignId('class_id')->constrained('classes');
+            $table->foreignId('class_id')->constrained('school_classes');
             $table->foreignId('teacher_id')->constrained('users');
-            
+
             $table->timestamps();
         });
     }

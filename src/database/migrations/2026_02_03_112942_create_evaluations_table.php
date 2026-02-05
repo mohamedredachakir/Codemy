@@ -17,7 +17,7 @@ return new class extends Migration
 
             $table->foreignId('student_id')->constrained('users');
             $table->foreignId('brief_id')->constrained('briefs');
-            $table->foreignId('competence_id')->constrained('comptences');
+            $table->foreignId('competence_id')->constrained('competences');
             $table->foreignId('teacher_id')->constrained('users');
 
             $table->enum('level', [EvaluationLevelEnum::IMITER,

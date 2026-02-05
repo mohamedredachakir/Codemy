@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SchoolClass extends Model
 {
+    use HasFactory;
     protected $fillable = ['name'];
 
     public function student(){
@@ -17,7 +19,7 @@ class SchoolClass extends Model
         return $this->belongsToMany(User::class, 'class_teacher', 'class_id', 'teacher_id');
     }
 
-    public function breifs(){
+    public function briefs(){
         return $this->hasMany(Brief::class);
     }
 
