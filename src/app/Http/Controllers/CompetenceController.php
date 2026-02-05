@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Competence;
 use Illuminate\Http\Request;
 
 class CompetenceController extends Controller
@@ -11,7 +12,9 @@ class CompetenceController extends Controller
      */
     public function index()
     {
-        //
+        $competences = Competence::all();
+        return view('competences.index', compact('competences'));
+
     }
 
     /**
@@ -19,7 +22,7 @@ class CompetenceController extends Controller
      */
     public function create()
     {
-        //
+        return view('competences.create');
     }
 
     /**
@@ -27,7 +30,15 @@ class CompetenceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'code' => 'required|integer',
+            'label' => 'required'
+        ]);
+
+        $competence = Competence::create($validate);
+        if($competence){
+            return redirect()->route('competences.index')->with('success', 'competence created!!');
+        }else { return "error! register competence failed!";}
     }
 
     /**
@@ -35,7 +46,8 @@ class CompetenceController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $competence = Competence::with(['sprints'])->find($id);
+        return view('competences.show',compact('competence'));
     }
 
     /**
@@ -43,7 +55,13 @@ class CompetenceController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+        return redirect()->route('/')
+            ->with('error','No access');
+        }
+
+        $competence = Competence::with(['sprints'])->find($id);
+        return view('competences.edit', compact('competence'));
     }
 
     /**
@@ -51,7 +69,18 @@ class CompetenceController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+        return redirect()->route('/')
+            ->with('error','No access');
+        }
+
+        $competence = Competence::find($id);
+        $validate = $request->validate([
+            'code' => 'required|integer',
+            'label' => 'required'
+        ]);
+        $competence->update($validate);
+        return redirect()->route('competences.index')->with('success', 'competence updated!!');
     }
 
     /**
@@ -59,6 +88,12 @@ class CompetenceController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+        return redirect()->route('/')
+            ->with('error','No access');
+        }
+
+        Competence::find($id)->delete();
+        return redirect()->route('competences.index')->with('success', 'competence deleted!!');
     }
 }
