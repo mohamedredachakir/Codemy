@@ -62,7 +62,7 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with(['schoolclass','submissions','evaluations'])->find($id);
+        $user = User::with(['schoolclass','submissions','evaluationsGiven','evaluationsReceived'])->find($id);
         return view("users.show", compact('user'));
     }
 
