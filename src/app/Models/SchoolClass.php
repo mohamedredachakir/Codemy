@@ -10,14 +10,15 @@ class SchoolClass extends Model
     use HasFactory;
     protected $fillable = ['name'];
 
-    public function student(){
+    public function students(){
         return $this->hasMany(User::class, 'class_id')
-        ->where('role', 'student');
+                    ->where('role', UserRole::STUDENT);
     }
 
-    public function teacher(){
+    public function teachers(){
         return $this->belongsToMany(User::class, 'class_teacher', 'class_id', 'teacher_id');
     }
+
 
     public function briefs(){
         return $this->hasMany(Brief::class);
