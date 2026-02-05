@@ -12,8 +12,12 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
-           $credentails = $request->validate([]);
-           if($credentails){
+           $credentails = $request->validate([
+            "email" => "required|email",
+            "password" => "required"
+           ]);
+           if(Auth::attempt($credentails)){
+            $request->session()->regenerate(); 
             return redirect()->route("dashboard")->with("login","seccsus!!");
            }else{
             return "error login!";
