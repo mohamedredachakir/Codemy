@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Enums\UserRole;
 use App\Models\SchoolClass;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -26,7 +27,7 @@ class DatabaseSeeder extends Seeder
             'last_name'  => 'User',
             'email'      => 'test@example.com',
             'password'   => bcrypt('password'),
-            'role'       => 'student',
+            'role'       => UserRole::ADMIN,
             'class_id'   => $class->id,
         ]);
 
