@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sprint;
 use Illuminate\Http\Request;
+
+            // $table->string('name');
+            // $table->integer('duration');
+            // $table->integer('order');
 
 class SprintController extends Controller
 {
@@ -11,7 +16,8 @@ class SprintController extends Controller
      */
     public function index()
     {
-        //
+        $sprints = Sprint::all();
+        return view('sprints.index', compact('sprints'));
     }
 
     /**
@@ -19,7 +25,7 @@ class SprintController extends Controller
      */
     public function create()
     {
-        //
+        return view('sprints.create');
     }
 
     /**
@@ -27,7 +33,21 @@ class SprintController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required',
+            'duration' => 'required|integer',
+            'order' => 'required|integer'
+        ]);
+
+        $sprint = Sprint::create([
+            'name' => $validated['name'],
+            'duration' => $validated['duration'],
+            'order' => $validated['order']
+        ]);
+
+        if($sprint){
+            return redirect()->route('sprints.index')->with('succes', 'sprints created!');
+        }else {return 'error! create sprint failed!!';}
     }
 
     /**
@@ -35,7 +55,8 @@ class SprintController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $sprint = Sprint::with(['classes'])->find($id);
+        return view('sprints.show', compact('sprint'));
     }
 
     /**
@@ -43,7 +64,13 @@ class SprintController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+        return redirect()->route('/')
+            ->with('error','No access');
+        }
+
+        $sprint = Sprint::with(['classes'])->find($id);
+        return view('sprints.edit', compact('sprint'));
     }
 
     /**
@@ -51,7 +78,23 @@ class SprintController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+        return redirect()->route('/')
+            ->with('error','No access');
+        }
+
+        $sprint = Sprint::find($id);
+
+        $validated = $request->validate([
+            'name' => 'required',
+            'duration' => 'required',
+            'order' => 'required'
+        ]);
+
+        $sprint->update($validated);
+        return redirect()->route('sprints.index')
+        ->with('success', 'Sprint updated');
+
     }
 
     /**
@@ -59,6 +102,12 @@ class SprintController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+        return redirect()->route('/')
+            ->with('error','No access');
+        }
+
+        Sprint::find($id)->delete();
+        return redirect()->route('sprints.index')->with('success', 'sprint delete!');
     }
 }
