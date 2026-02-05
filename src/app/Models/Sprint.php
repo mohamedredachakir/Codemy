@@ -18,13 +18,15 @@ class Sprint extends Model
     }
 
     public function classes() {
-        return $this->belongsToMany(SchoolClass::class, "class_sprint");
+        return $this->belongsToMany(SchoolClass::class, "class_sprint",
+        'sprint_id',
+        'class_id');
     }
 
     public function competences(){
         return $this->belongsToMany(Competence::class,"competence_sprint");
     }
 
-    
+
 
 }
