@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SchoolClass;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ClassController extends Controller
@@ -30,7 +31,17 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            "name" => "required"
+        ]);
+
+        $class = SchoolClass::create([
+            "name" => $validated['name']
+        ]);
+
+        if($class){
+            return redirect()->route("classes.index")->with("succes", "class created!");
+        }else { return "error! register class failed!";}
     }
 
     /**
@@ -38,7 +49,8 @@ class ClassController extends Controller
      */
     public function show(string $id)
     {
-        //
+            $class = SchoolClass::with(['student','teacher'])->find($id);
+            return view('classes.show', compact('class'));
     }
 
     /**
@@ -46,7 +58,14 @@ class ClassController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+            return redirect()->route('/')
+                ->with('error','No access');
+        }
+
+        $class = SchoolClass::with(['student','teacher'])->find($id);
+
+        return view('classes.edit', compact('class'));
     }
 
     /**
@@ -54,7 +73,19 @@ class ClassController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+            if(!auth()->user()->isAdmin()){
+            return redirect()->route('/')
+                ->with('error','No access');
+        }
+
+        $class = SchoolClass::find($id);
+
+        $validated = $request->validate([
+            "name" => "required"
+        ]);
+
+        $class->update($validated);
+        return redirect()->route('classes.index', compact('class'));
     }
 
     /**
@@ -62,6 +93,15 @@ class ClassController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if(!auth()->user()->isAdmin()){
+            return redirect()->route('/')
+                ->with('error','No access');
+        }
+
+        SchoolClass::findOrFail($id)->delete();
+
+        return redirect()->route('classes.index')
+            ->with('success', 'Class deleted');
     }
+
 }
