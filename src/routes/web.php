@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BriefController;
+use App\Http\Controllers\EvaluationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
@@ -33,6 +35,8 @@ Route::middleware('auth')->group(function () {
 Route::resource('classes', ClassController::class);
 Route::resource('sprints', SprintController::class);
 Route::resource('competences', CompetenceController::class);
+Route::resource('briefs', BriefController::class);
+Route::resource('evaluations', EvaluationController::class);
 
 
 Route::middleware(['auth'])->group(function() {
