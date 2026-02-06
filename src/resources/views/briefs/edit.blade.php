@@ -2,36 +2,43 @@
 
 @section('content')
 
-<h1>Edit Brief</h1>
-
 <form action="{{ route('briefs.update', $brief->id) }}" method="POST">
     @csrf
     @method('PUT')
 
-    <div>
-        <label>Title</label>
-        <input type="text" name="title" value="{{ old('title', $brief->title) }}">
-    </div>
+    <label>Title</label>
+    <input type="text" name="title" value="{{ $brief->title }}">
 
-    <div>
-        <label>Description</label>
-        <textarea name="description">{{ old('description', $brief->description) }}</textarea>
-    </div>
+    <label>Class</label>
+    <select name="class_id">
+        @foreach($classes as $class)
+            <option value="{{ $class->id }}" @selected($brief->class_id == $class->id)>
+                {{ $class->name }}
+            </option>
+        @endforeach
+    </select>
 
-    <div>
+    <label>Description</label>
+    <textarea name="description">{{ $brief->description }}</textarea>
+
+    <label>Estimated Time (days)</label>
+    <input type="number" name="estimated_time" value="{{ $brief->estimated_time }}">
+
+        <label>Type</label>
+        <select name="type" required>
+            <option value="{{ \App\Enums\BriefTypeEnum::INDIVIDUAL }}">Individual</option>
+            <option value="{{ \App\Enums\BriefTypeEnum::GROUP }}">Group</option>
+        </select>
         <label>Sprint</label>
-        <select name="sprint_id">
+        <select name="sprint_id" required>
             @foreach($sprints as $sprint)
-                <option value="{{ $sprint->id }}"
-                    {{ $brief->sprint_id == $sprint->id ? 'selected' : '' }}>
-                    {{ $sprint->name }}
-                </option>
+                <option value="{{ $sprint->id }}">{{ $sprint->name }} ({{ $sprint->duration }} days)</option>
             @endforeach
         </select>
     </div>
 
+
+
     <button type="submit">Update Brief</button>
-
 </form>
-
 @endsection
