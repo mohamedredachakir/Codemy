@@ -14,7 +14,9 @@ class DashboardController extends Controller
             return view("dashboard.admin");
         }
         if($user->isTeacher()){
-            return view("dashboard.teacher");
+            $teacher = auth()->user();
+            $classes = $teacher->teachingclasses()->with(['sprints.briefs'])->get();
+            return view("dashboard.teacher", compact('classes'));
         }
         if($user->isStudent()){
             return view("dashboard.student");
