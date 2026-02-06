@@ -15,7 +15,8 @@ class BriefController extends Controller
      */
     public function index()
     {
-        $briefs = Brief::with('sprint')->get();
+        $teacher = auth()->user();
+        $briefs = Brief::whereIn('class_id', $teacher->teachingclasses->pluck('id'))->get();
         return view('briefs.index', compact('briefs'));
     }
 
@@ -69,7 +70,17 @@ class BriefController extends Controller
      */
     public function edit(string $id)
     {
-        //
+            if(!auth()->user()->isTeacher()){
+            return redirect()->route('/')
+                ->with('error','No access');
+        }
+
+        // $brief = Brief::findOrFail($id);
+        // $classes = auth()->user()->teachingclasses;
+        $sprints = Sprint::all();
+        $brief = Brief::findOrFail($id);
+        $classes = auth()->user()->teachingclasses;
+        return view('briefs.edit', compact('brief', 'classes', 'sprints'));
     }
 
     /**
@@ -77,7 +88,34 @@ class BriefController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+            if(!auth()->user()->isTeacher()){
+            return redirect()->route('/')
+                ->with('error','No access');
+        }
+
+        $validated = $request->validate([
+        'title' => 'required|string|max:255',
+        'description' => 'required|string',
+        'sprint_id' => 'required|exists:sprints,id',
+        'estimated_time' => 'required|integer|min:1',
+        'type' => 'required|in:individual,group',
+        'class_id' => 'exists:school_classes,id',
+        ]);
+
+        $brief = Brief::findOrFail($id);
+
+        $brief->update([
+        'title' => $request->title,
+        'description' => $request->description,
+        'sprint_id' => $request->sprint_id,
+        'estimated_time' => $request->estimated_time,
+        'type' => BriefTypeEnum::from($request->type),
+        'class_id' => $request->class_id,
+        'teacher_id' => auth()->id(),
+        ]);
+        return redirect()->route('dashboard')
+        ->with('success','Brief updated successfully');
+
     }
 
     /**
@@ -85,6 +123,13 @@ class BriefController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+            if(!auth()->user()->isTeacher()){
+            return redirect()->route('/')
+                ->with('error','No access');
+        }
+
+        Brief::findOrFail($id)->delete();
+                return redirect()->route('dashboard')
+        ->with('success','Brief deleted successfully');
     }
 }
