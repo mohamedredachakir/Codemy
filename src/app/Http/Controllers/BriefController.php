@@ -70,7 +70,17 @@ class BriefController extends Controller
      */
     public function show(string $id)
     {
+        $brief = Brief::with(['schoolclass.students', 'submissions'])->findOrFail($id);
+        
+        // Only teacher of the class can see this or admin
+        if (!auth()->user()->isAdmin() && !auth()->user()->teachingclasses->contains($brief->class_id)) {
+            return redirect()->route('dashboard')->with('error', 'Unauthorized access.');
+        }
 
+        $students = $brief->schoolclass->students;
+        $submissions = $brief->submissions->keyBy('student_id');
+
+        return view('briefs.show', compact('brief', 'students', 'submissions'));
     }
 
     /**
