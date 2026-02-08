@@ -10,10 +10,9 @@ class AssignController extends Controller
 {
         public function index()
     {
-
-        $classes = SchoolClass::all();
-        $teachers = User::where('role', 'teacher')->get();
-        $students = User::where('role', 'student')->get();
+        $classes = SchoolClass::with('teachers')->get();
+        $teachers = User::where('role', \App\Enums\UserRole::TEACHER)->get();
+        $students = User::where('role', \App\Enums\UserRole::STUDENT)->get();
 
         return view('assign.index', compact('classes', 'teachers', 'students'));
     }
