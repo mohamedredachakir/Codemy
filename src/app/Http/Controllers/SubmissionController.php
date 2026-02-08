@@ -11,8 +11,7 @@ class SubmissionController extends Controller
      */
     public function index()
     {
-        $submissions = auth()->user()->submissions()->with('brief')->get();
-        return view('student.index', compact('submissions'));
+        return redirect()->route('dashboard');
     }
 
     /**
