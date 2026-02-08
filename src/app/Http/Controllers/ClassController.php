@@ -49,7 +49,7 @@ class ClassController extends Controller
      */
     public function show(string $id)
     {
-            $class = SchoolClass::with(['student','teacher'])->find($id);
+            $class = SchoolClass::with(['students','teachers'])->findOrFail($id);
             return view('classes.show', compact('class'));
     }
 
@@ -63,7 +63,7 @@ class ClassController extends Controller
                 ->with('error','No access');
         }
 
-        $class = SchoolClass::with(['student','teacher'])->find($id);
+        $class = SchoolClass::with(['students','teachers'])->findOrFail($id);
 
         return view('classes.edit', compact('class'));
     }
@@ -85,7 +85,7 @@ class ClassController extends Controller
         ]);
 
         $class->update($validated);
-        return redirect()->route('classes.index', compact('class'));
+        return redirect()->route('classes.index');
     }
 
     /**
