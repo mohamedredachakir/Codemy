@@ -44,6 +44,12 @@
         </select>
     </div>
 
+    <div>
+        <label>
+            <input type="checkbox" name="is_published" value="1"> Publish immediately
+        </label>
+    </div>
+
     <button type="submit">Create Brief</button>
 </form>
 @endsection

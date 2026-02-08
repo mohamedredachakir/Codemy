@@ -22,6 +22,17 @@
         <label>Order</label>
         <input type="number" name="order" value="{{ $sprint->order }}" required>
     </div>
+    <label>Competences</label>
+
+<select name="competences[]" multiple class="form-control">
+
+@foreach($competences as $competence)
+    <option value="{{ $competence->id }}">
+        {{ $competence->label }}
+    </option>
+@endforeach
+
+</select>
 
     <button type="submit">Update</button>
 </form>

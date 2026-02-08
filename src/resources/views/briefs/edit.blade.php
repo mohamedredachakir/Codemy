@@ -39,6 +39,12 @@
 
 
 
+    <div>
+        <label>
+            <input type="checkbox" name="is_published" value="1" {{ $brief->is_published ? 'checked' : '' }}> Published
+        </label>
+    </div>
+
     <button type="submit">Update Brief</button>
 </form>
 @endsection
