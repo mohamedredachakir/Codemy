@@ -40,7 +40,7 @@ class UserController extends Controller
             "email" => "required|email|unique:users",
             "password" => "required|confirmed",
             "role"=> "nullable",
-            "class_id" => "nullable|exists:classes,id" ,
+            "class_id" => "nullable|exists:school_classes,id" ,
         ]);
 
         $user = User::create([
@@ -98,7 +98,7 @@ class UserController extends Controller
             'last_name'=> 'required',
             'email'=> 'required|email|unique:users,email,' . $id,
             'password'=> 'nullable|confirmed',
-            'class_id' => 'nullable|exists:classes,id'
+            'class_id' => 'nullable|exists:school_classes,id'
         ]);
 
         if($request->filled('password')){
