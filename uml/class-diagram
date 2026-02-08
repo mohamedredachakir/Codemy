@@ -1,0 +1,141 @@
+classDiagram
+    class User {
+        <<abstract>>
+        #int id
+        #string name
+        #string email
+        #string password
+        #RoleEnum role
+        +login()
+        +logout()
+    }
+    
+    class Student {
+        -int class_id
+        +viewBriefs()
+        +submitBrief()
+        +viewEvaluations()
+    }
+    
+    class Teacher {
+        +createBrief()
+        +getSprintsByClass()
+        +selectBrief()
+        +selectStudent()
+        +saveEvaluations()
+    }
+    
+    class Admin {
+        +manageUsers()
+        +manageClasses()
+        +manageSprints()
+    }
+    
+    class Class {
+        -int id
+        -string name
+        +getStudents()
+        +getTeachers()
+        +getBriefs()
+    }
+    
+    class Sprint {
+        -int id
+        -string name
+        -int duration
+        -int order
+        +getCompetences()
+        +getBriefs()
+    }
+    
+    class Competence {
+        -int id
+        -string code
+        -string label
+        +getEvaluations()
+    }
+    
+    class Brief {
+        -int id
+        -string title
+        -text description
+        -int estimated_duration
+        -TypeEnum type
+        -int sprint_id
+        -int class_id
+        -int teacher_id
+        +publish()
+        +getSubmissions()
+    }
+    
+    class Submission {
+        -int id
+        -int student_id
+        -int brief_id
+        -text content
+        -datetime submitted_at
+        +isLate()
+        +getEvaluation()
+    }
+    
+    class Evaluation {
+        -int id
+        -int student_id
+        -int brief_id
+        -int competence_id
+        -int teacher_id
+        -LevelEnum level
+        -text comment
+        -datetime evaluated_at
+        +calculateScore()
+    }
+
+    %% Enumerations
+    class RoleEnum {
+        <<enumeration>>
+        ADMIN
+        TEACHER
+        STUDENT
+    }
+    
+    class TypeEnum {
+        <<enumeration>>
+        INDIVIDUAL
+        GROUP
+    }
+    
+    class LevelEnum {
+        <<enumeration>>
+        IMITER
+        S_ADAPTER
+        TRANSPOSER
+    }
+
+    %% Inheritance Relationships
+    User <|-- Student : extends
+    User <|-- Teacher : extends
+    User <|-- Admin : extends
+
+    %% Composition and Aggregation
+    Class "1" o-- "0..*" Student : enrolls
+    Class "0..*" o-- "0..*" Teacher : taught by
+    Class "1" *-- "0..*" Brief : contains
+    Sprint "1" *-- "0..*" Brief : organizes
+    Brief "1" *-- "0..*" Submission : receives
+    Brief "1" *-- "0..*" Evaluation : evaluated through
+    
+    %% Direct Associations
+    Teacher "1" -- "0..*" Brief : creates >
+    Student "1" -- "0..*" Submission : submits >
+    Teacher "1" -- "0..*" Evaluation : provides >
+    Student "1" -- "0..*" Evaluation : receives >
+    Competence "1" -- "0..*" Evaluation : measures >
+    
+    %% Many-to-Many Relationships
+    Class "0..*" -- "0..*" Sprint : includes
+    Sprint "1..*" -- "1..*" Competence : evaluates
+    
+    %% Enum relationships
+    User -- RoleEnum
+    Brief -- TypeEnum
+    Evaluation -- LevelEnum
