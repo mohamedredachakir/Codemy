@@ -2,21 +2,16 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Competence;
 
 class CompetenceSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Competence::create([
-        'code' => 'C1',
-        'label' => 'Backend Development'
-         ]);
-
+        Competence::create(['code' => 'OOP', 'label' => 'Object Oriented Programming']);
+        Competence::create(['code' => 'MVC', 'label' => 'Model View Controller']);
+        Competence::create(['code' => 'Blade', 'label' => 'Blade Templating']);
+        Competence::create(['code' => 'Routing', 'label' => 'Laravel Routing']);
     }
 }
