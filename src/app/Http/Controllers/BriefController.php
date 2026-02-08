@@ -13,10 +13,16 @@ class BriefController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $teacher = auth()->user();
-        $briefs = Brief::whereIn('class_id', $teacher->teachingclasses->pluck('id'))->get();
+        $query = Brief::whereIn('class_id', $teacher->teachingclasses->pluck('id'));
+
+        if ($request->has('class_id')) {
+            $query->where('class_id', $request->class_id);
+        }
+
+        $briefs = $query->with('schoolclass')->get();
         return view('briefs.index', compact('briefs'));
     }
 
@@ -42,6 +48,7 @@ class BriefController extends Controller
         'estimated_time' => 'required|integer|min:1',
         'type' => 'required|in:individual,group',
         'class_id' => 'exists:school_classes,id',
+        'is_published' => 'nullable|boolean',
         ]);
 
         Brief::create([
@@ -52,6 +59,7 @@ class BriefController extends Controller
         'type' => BriefTypeEnum::from($request->type),
         'class_id' => $request->class_id,
         'teacher_id' => auth()->id(),
+        'is_published' => $request->has('is_published'),
         ]);
             return redirect()->route('dashboard')
         ->with('success','Brief created successfully');
@@ -62,7 +70,7 @@ class BriefController extends Controller
      */
     public function show(string $id)
     {
-        //
+
     }
 
     /**
@@ -75,10 +83,11 @@ class BriefController extends Controller
                 ->with('error','No access');
         }
 
-        // $brief = Brief::findOrFail($id);
-        // $classes = auth()->user()->teachingclasses;
-        $sprints = Sprint::all();
         $brief = Brief::findOrFail($id);
+        if ($brief->teacher_id != auth()->id()) {
+             return redirect()->route('dashboard')->with('error', 'You can only edit your own briefs.');
+        }
+        $sprints = Sprint::all();
         $classes = auth()->user()->teachingclasses;
         return view('briefs.edit', compact('brief', 'classes', 'sprints'));
     }
@@ -93,6 +102,11 @@ class BriefController extends Controller
                 ->with('error','No access');
         }
 
+        $brief = Brief::findOrFail($id);
+        if ($brief->teacher_id != auth()->id()) {
+            return redirect()->route('dashboard')->with('error', 'You can only update your own briefs.');
+        }
+
         $validated = $request->validate([
         'title' => 'required|string|max:255',
         'description' => 'required|string',
@@ -100,9 +114,9 @@ class BriefController extends Controller
         'estimated_time' => 'required|integer|min:1',
         'type' => 'required|in:individual,group',
         'class_id' => 'exists:school_classes,id',
+        'is_published' => 'nullable|boolean',
         ]);
 
-        $brief = Brief::findOrFail($id);
 
         $brief->update([
         'title' => $request->title,
@@ -112,6 +126,7 @@ class BriefController extends Controller
         'type' => BriefTypeEnum::from($request->type),
         'class_id' => $request->class_id,
         'teacher_id' => auth()->id(),
+        'is_published' => $request->has('is_published'),
         ]);
         return redirect()->route('dashboard')
         ->with('success','Brief updated successfully');
@@ -128,7 +143,12 @@ class BriefController extends Controller
                 ->with('error','No access');
         }
 
-        Brief::findOrFail($id)->delete();
+        $brief = Brief::findOrFail($id);
+        if ($brief->teacher_id != auth()->id()) {
+            return redirect()->route('dashboard')->with('error', 'You can only delete your own briefs.');
+        }
+
+        $brief->delete();
                 return redirect()->route('dashboard')
         ->with('success','Brief deleted successfully');
     }

@@ -11,15 +11,17 @@ class SubmissionController extends Controller
      */
     public function index()
     {
-        //
+        $submissions = auth()->user()->submissions()->with('brief')->get();
+        return view('student.index', compact('submissions'));
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $brief = \App\Models\Brief::where('is_published', true)->findOrFail($request->brief_id);
+        return view('student.submit', compact('brief'));
     }
 
     /**
@@ -27,7 +29,32 @@ class SubmissionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'brief_id' => 'required|exists:briefs,id',
+            'content' => 'required|string',
+        ]);
+
+        $exists = \App\Models\Submission::where('student_id', auth()->id())
+            ->where('brief_id', $request->brief_id)
+            ->exists();
+
+        if ($exists) {
+            return back()->withErrors(['brief_id' => 'You have already submitted for this brief.']);
+        }
+
+        $brief = \App\Models\Brief::where('is_published', true)->find($request->brief_id);
+        if (!$brief) {
+             return redirect()->route('dashboard')->with('error', 'Unpublished brief.');
+        }
+
+        \App\Models\Submission::create([
+            'student_id' => auth()->id(),
+            'brief_id' => $request->brief_id,
+            'content' => $request->content,
+            'submitted_at' => now(),
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Submitted successfully');
     }
 
     /**

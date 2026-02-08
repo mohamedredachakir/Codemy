@@ -12,16 +12,19 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
-           $credentails = $request->validate([
+           $credentials = $request->validate([
             "email" => "required|email",
             "password" => "required"
            ]);
-           if(Auth::attempt($credentails)){
-            $request->session()->regenerate(); 
-            return redirect()->route("dashboard")->with("login","seccsus!!");
-           }else{
-            return "error login!";
+
+           if(Auth::attempt($credentials)){
+            $request->session()->regenerate();
+            return redirect()->intended(route("dashboard"))->with("login","Welcome back!");
            }
+
+           return back()->withErrors([
+               'email' => 'The provided credentials do not match our records.',
+           ])->onlyInput('email');
     }
 
     public function logout(){

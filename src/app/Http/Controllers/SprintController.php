@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sprint;
+use App\Models\Competence;
 use Illuminate\Http\Request;
 
             // $table->string('name');
@@ -25,7 +26,8 @@ class SprintController extends Controller
      */
     public function create()
     {
-        return view('sprints.create');
+        $competences = Competence::all();
+        return view('sprints.create', compact('competences'));
     }
 
     /**
@@ -44,6 +46,8 @@ class SprintController extends Controller
             'duration' => $validated['duration'],
             'order' => $validated['order']
         ]);
+
+        $sprint->competences()->sync($request->competences);
 
         if($sprint){
             return redirect()->route('sprints.index')->with('succes', 'sprints created!');
@@ -68,9 +72,10 @@ class SprintController extends Controller
         return redirect()->route('/')
             ->with('error','No access');
         }
+    $sprint = Sprint::with(['classes','competences'])->findOrFail($id);
+    $competences = Competence::all();
 
-        $sprint = Sprint::with(['classes'])->find($id);
-        return view('sprints.edit', compact('sprint'));
+    return view('sprints.edit', compact('sprint','competences'));
     }
 
     /**
