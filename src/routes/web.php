@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\BriefController;
 use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
@@ -23,24 +24,32 @@ Route::middleware('guest')->group(function () {
 
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resource('users', UserController::class);
-});
+    // Admin Only
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('users', UserController::class);
+        Route::resource('classes', ClassController::class);
+        Route::resource('sprints', SprintController::class);
+        Route::resource('competences', CompetenceController::class);
+        Route::get('/assign', [AssignController::class, 'index'])->name('assign.index');
+        Route::post('/assign/teacher', [AssignController::class, 'assignTeacher'])->name('assign.teacher');
+        Route::post('/assign/student', [AssignController::class, 'assignStudent'])->name('assign.student');
+    });
 
+    // Teacher Only
+    Route::middleware(['role:teacher'])->group(function () {
+        Route::resource('briefs', BriefController::class);
+        Route::resource('evaluations', EvaluationController::class)->except(['show']);
+    });
 
-Route::resource('classes', ClassController::class);
-Route::resource('sprints', SprintController::class);
-Route::resource('competences', CompetenceController::class);
-Route::resource('briefs', BriefController::class);
-Route::resource('evaluations', EvaluationController::class);
+    // Student Only
+    Route::middleware(['role:student'])->group(function () {
+        Route::resource('submissions', SubmissionController::class);
+    });
 
-
-Route::middleware(['auth'])->group(function() {
-    Route::get('/assign', [AssignController::class, 'index'])->name('assign.index');
-    Route::post('/assign/teacher', [AssignController::class, 'assignTeacher'])->name('assign.teacher');
-    Route::post('/assign/student', [AssignController::class, 'assignStudent'])->name('assign.student');
+    // Shared Viewing
+    Route::get('/evaluations/{brief_id}', [EvaluationController::class, 'show'])->name('evaluations.show');
 });
