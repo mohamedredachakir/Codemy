@@ -19,10 +19,10 @@ class Submission extends Model
     }
 
     public function brief(){
-        return $this->belongsTo(User::class,);
+        return $this->belongsTo(Brief::class);
     }
 
-    public function evaluation(){
-        return $this->hasOne(Evaluation::class);
+    public function evaluations(){
+        return $this->hasMany(Evaluation::class);
     }
 }

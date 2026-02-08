@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\EvaluationLevelEnum;
 
 class Evaluation extends Model
 {
@@ -11,15 +12,20 @@ class Evaluation extends Model
         "brief_id",
         "competence_id",
         "teacher_id",
+        "submission_id",
         "level",
         "comment",
         "evaluated_at"
     ];
 
 
-    protected $casts = [
-        'level' => EvaluationLevelEnum::class
-    ];
+    protected function casts(): array
+    {
+        return [
+            'level' => EvaluationLevelEnum::class,
+            'evaluated_at' => 'datetime',
+        ];
+    }
 
 
     public function student() {
@@ -36,5 +42,9 @@ class Evaluation extends Model
 
     public function competence(){
         return $this->belongsTo(Competence::class);
+    }
+
+    public function submission(){
+        return $this->belongsTo(Submission::class);
     }
 }

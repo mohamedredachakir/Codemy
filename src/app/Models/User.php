@@ -27,10 +27,10 @@ class User extends Authenticatable
         'class_id',
     ];
 
-    protected $casts = ['role' => UserRole::class];
+
 
     public function schoolclass(){
-        return $this->belongsTo(SchoolClass::class);
+        return $this->belongsTo(SchoolClass::class, 'class_id');
     }
 
     public function teachingclasses(){
@@ -85,6 +85,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
         ];
     }
 }

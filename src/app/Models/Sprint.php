@@ -13,7 +13,7 @@ class Sprint extends Model
     ];
 
 
-    public function breif(){
+    public function briefs(){
         return $this->hasMany(Brief::class);
     }
 
@@ -27,6 +27,14 @@ class Sprint extends Model
         return $this->belongsToMany(Competence::class,"competence_sprint");
     }
 
+    protected static function boot()
+    {
+        parent::boot();
 
-
+        static::deleting(function ($sprint) {
+            if ($sprint->briefs()->count() > 0) {
+                throw new \Exception("Cannot delete sprint with existing briefs.");
+            }
+        });
+    }
 }

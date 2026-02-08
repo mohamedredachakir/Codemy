@@ -18,7 +18,7 @@ class SchoolClass extends Model
 
     public function teachers(){
         return $this->belongsToMany(User::class, 'class_teacher', 'class_id', 'teacher_id')
-        ->where('role', UserRole::STUDENT);
+        ->where('role', UserRole::TEACHER);
     }
 
 

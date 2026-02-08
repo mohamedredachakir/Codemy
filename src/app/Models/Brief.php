@@ -11,19 +11,25 @@ class Brief extends Model
         "title",
         "description",
         "estimated_time",
-        "type","sprint_id",
+        "type",
+        "sprint_id",
         "class_id",
-        "teacher_id"
+        "teacher_id",
+        "is_published"
     ];
 
 
-    protected $casts = [
-        'type' => BriefTypeEnum::class,
-    ];
+    protected function casts(): array
+    {
+        return [
+            'type' => BriefTypeEnum::class,
+            'is_published' => 'boolean',
+        ];
+    }
 
 
     public function sprint(){
-        return $this->belongsTo(Brief::class);
+        return $this->belongsTo(Sprint::class);
     }
 
     public function schoolclass(){
@@ -39,5 +45,16 @@ class Brief extends Model
     }
     public function evaluations(){
         return $this->hasMany(Evaluation::class);
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($brief) {
+            if ($brief->submissions()->count() > 0 || $brief->evaluations()->count() > 0) {
+                throw new \Exception("Cannot delete brief with existing submissions or evaluations.");
+            }
+        });
     }
 }
